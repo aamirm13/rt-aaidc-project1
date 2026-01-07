@@ -1,90 +1,104 @@
 import os
+import hashlib
+from typing import List, Dict, Any, Optional
+
 import chromadb
-from typing import List, Dict, Any
 from sentence_transformers import SentenceTransformer
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 class VectorDB:
     """
-    A simple vector database wrapper using ChromaDB with HuggingFace embeddings.
+    ChromaDB-backed vector store using SentenceTransformers embeddings.
+    Stores text chunks + embeddings + metadata for retrieval-augmented generation.
     """
 
-    def __init__(self, collection_name: str = None, embedding_model: str = None):
-        """
-        Initialize the vector database.
-
-        Args:
-            collection_name: Name of the ChromaDB collection
-            embedding_model: HuggingFace model name for embeddings
-        """
-        self.collection_name = collection_name or os.getenv(
-            "CHROMA_COLLECTION_NAME", "rag_documents"
-        )
+    def __init__(
+        self,
+        collection_name: Optional[str] = None,
+        embedding_model: Optional[str] = None,
+        persist_path: str = "./chroma_db",
+    ):
+        self.collection_name = collection_name or os.getenv("COLLECTION_NAME", "rag_collection")
         self.embedding_model_name = embedding_model or os.getenv(
             "EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"
         )
 
-        # Initialize ChromaDB client
-        self.client = chromadb.PersistentClient(path="./chroma_db")
+        # Persistent Chroma DB
+        self.client = chromadb.PersistentClient(path=persist_path)
 
-        # Load embedding model
+        # Make similarity space explicit
+        self.collection = self.client.get_or_create_collection(
+            name=self.collection_name,
+            metadata={"hnsw:space": "cosine"},
+        )
+
         print(f"Loading embedding model: {self.embedding_model_name}")
         self.embedding_model = SentenceTransformer(self.embedding_model_name)
 
-        # Get or create collection
-        self.collection = self.client.get_or_create_collection(
-            name=self.collection_name,
-            metadata={"description": "RAG document collection"},
+        # Chunking
+        self.chunk_size = int(os.getenv("CHUNK_SIZE", "900"))
+        self.chunk_overlap = int(os.getenv("CHUNK_OVERLAP", "150"))
+        self.splitter = RecursiveCharacterTextSplitter(
+            chunk_size=self.chunk_size,
+            chunk_overlap=self.chunk_overlap,
+            separators=["\n\n", "\n", ". ", " ", ""],
         )
 
-        print(f"Vector database initialized with collection: {self.collection_name}")
+    def chunk_text(self, text: str) -> List[str]:
+        text = (text or "").strip()
+        if not text:
+            return []
+        return self.splitter.split_text(text)
 
-    def chunk_text(self, text: str, chunk_size: int = 500) -> List[str]:
-        words = text.split()
-        chunks = []
-        current_chunk = []
-        current_length = 0
+    @staticmethod
+    def _make_stable_id(source: str, chunk_index: int, chunk_text: str) -> str:
+        base = f"{source}|{chunk_index}|{chunk_text}"
+        h = hashlib.sha1(base.encode("utf-8")).hexdigest()
+        return f"{source}_chunk_{chunk_index}_{h[:12]}"
 
-        for word in words:
-            current_chunk.append(word)
-            current_length += len(word) + 1  # +1 for space
+    def add_documents(self, documents: List[Dict[str, Any]]) -> None:
+        """
+        Ingest docs into Chroma: chunk → embed → store (with metadata + stable IDs).
+        Each document is expected to be {"content": str, "metadata": dict}.
+        """
+        if not documents:
+            print("No documents provided for ingestion.")
+            return
 
-            if current_length >= chunk_size:
-                chunks.append(" ".join(current_chunk))
-                current_chunk = []
-                current_length = 0
+        all_chunks: List[str] = []
+        all_metadatas: List[Dict[str, Any]] = []
+        all_ids: List[str] = []
 
-        if current_chunk:
-            chunks.append(" ".join(current_chunk))
+        for doc in documents:
+            content = (doc.get("content") or "").strip()
+            metadata = doc.get("metadata") or {}
 
-        return chunks
-
-
-    def add_documents(self, documents: List) -> None:
-        print(f"Processing {len(documents)} documents...")
-
-        all_chunks = []
-        all_metadatas = []
-        all_ids = []
-
-        for doc_idx, doc in enumerate(documents):
-            content = doc.get("content", "")
-            metadata = doc.get("metadata", {})
+            source = metadata.get("source", "unknown_source")
 
             chunks = self.chunk_text(content)
-
-            for chunk_idx, chunk in enumerate(chunks):
-                chunk_id = f"doc_{doc_idx}_chunk_{chunk_idx}"
+            for i, chunk in enumerate(chunks):
+                chunk_id = self._make_stable_id(source, i, chunk)
                 all_chunks.append(chunk)
-                all_metadatas.append(metadata)
+                all_metadatas.append(
+                    {
+                        **metadata,
+                        "source": source,
+                        "chunk_id": chunk_id,
+                        "chunk_index": i,
+                    }
+                )
                 all_ids.append(chunk_id)
 
         if not all_chunks:
-            print("No chunks to add.")
+            print("No chunks produced; nothing to ingest.")
             return
 
-        embeddings = self.embedding_model.encode(all_chunks).tolist()
+        print(f"Embedding {len(all_chunks)} chunks...")
+        embeddings = self.embedding_model.encode(all_chunks, show_progress_bar=False).tolist()
 
+        # Add to Chroma
+        # NOTE: If you re-run ingestion, stable IDs prevent duplicates.
         self.collection.add(
             documents=all_chunks,
             metadatas=all_metadatas,
@@ -92,21 +106,21 @@ class VectorDB:
             embeddings=embeddings,
         )
 
-        print(f"Added {len(all_chunks)} chunks to vector database")
-
+        print("Ingestion complete.")
 
     def search(self, query: str, n_results: int = 5) -> Dict[str, Any]:
-        query_embedding = self.embedding_model.encode([query]).tolist()
+        query = (query or "").strip()
+        if not query:
+            return {"documents": [[]], "metadatas": [[]], "distances": [[]]}
+
+        query_embedding = self.embedding_model.encode([query], show_progress_bar=False).tolist()
 
         results = self.collection.query(
             query_embeddings=query_embedding,
             n_results=n_results,
+            include=["documents", "metadatas", "distances"],
         )
+        return results
 
-        return {
-            "documents": results.get("documents", []),
-            "metadatas": results.get("metadatas", []),
-            "distances": results.get("distances", []),
-            "ids": results.get("ids", []),
-        }
-
+    def count(self) -> int:
+        return self.collection.count()
