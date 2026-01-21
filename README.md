@@ -15,6 +15,7 @@ Ingest → Chunk → Embed → Store → Retrieve → Generate
 It is developed as part of the ReadyTensor Agentic AI Developer Certification and follows the architectural principles taught in the learning material on embeddings, vector databases, chunking strategies, semantic retrieval, and retrieval-augmented generation.
 
 **Key Features**
+
 Core RAG Capabilities:
 
 - Vector database retrieval using ChromaDB (cosine similarity / HNSW index)
@@ -71,6 +72,7 @@ Traceability:
 - Full audit trail from answer → chunk → document
 
 **System Architecture**
+
 Two-Phase RAG Pipeline:
 1. Knowledge Ingestion (Insertion Phase)
 
@@ -127,6 +129,7 @@ Each document is treated as a first-class source
 Metadata is preserved for traceability and citation
 
 **Evaluation Framework**
+
 Metrics:
 
 - Vector Distance Scores (cosine distance from ChromaDB)
@@ -168,6 +171,7 @@ Behavioral Validation:
 - Streamlit (optional UI interface)
 
 **Project Structure**
+
 project-root/
 │
 ├── src/
@@ -182,6 +186,7 @@ project-root/
 └── .env
 
 **Setup Instructions**
+
 1. Install Dependencies
 pip install -r requirements.txt
 
@@ -214,6 +219,7 @@ CHUNK_OVERLAP=150
 COLLECTION_NAME=rag_collection
 
 **Running the Project**
+
 CLI Mode
 
 Navigate to project root:
@@ -230,6 +236,7 @@ Optional UI
 streamlit run src/streamlit_app.py
 
 **Example Behavior**
+
 Valid Query
 User: What is quantum computing?
 → Grounded answer with citations
