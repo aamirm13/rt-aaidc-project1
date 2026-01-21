@@ -1,8 +1,8 @@
-RAG Assistant
+**RAG Assistant**
 
-LangChain + ChromaDB | ReadyTensor Agentic AI Developer Certification
+**LangChain + ChromaDB | ReadyTensor Agentic AI Developer Certification**
 
-Overview
+**Overview**
 
 This project implements a Retrieval-Augmented Generation (RAG) assistant that answers user questions using a local document collection (data/) instead of relying on static model training knowledge.
 
@@ -14,7 +14,7 @@ Ingest → Chunk → Embed → Store → Retrieve → Generate
 
 It is developed as part of the ReadyTensor Agentic AI Developer Certification and follows the architectural principles taught in the learning material on embeddings, vector databases, chunking strategies, semantic retrieval, and retrieval-augmented generation.
 
-Key Features
+**Key Features**
 Core RAG Capabilities:
 
 - Vector database retrieval using ChromaDB (cosine similarity / HNSW index)
@@ -35,15 +35,15 @@ Core RAG Capabilities:
 
 - Environment-based model switching using .env configuration
 
-Safety, Reliability, and Control:
+**Safety, Reliability, and Control:**
 
-- Relevance Thresholding
+Relevance Thresholding:
 
 - Vector distance filtering rejects off-topic queries
 
 - Prevents hallucinated answers for unrelated inputs
 
-- Prompt Hardening
+Prompt Hardening:
 
 - System prompt enforces grounded answers only
 
@@ -51,26 +51,26 @@ Safety, Reliability, and Control:
 
 - Immunity to instruction override attempts (prompt injection resistance)
 
-- Grounded Answering
+Grounded Answering:
 
 - Answers use retrieved context only
 
 - Refusal behavior:
 “I don't know based on the provided documents.”
 
-- Transparency
+Transparency:
 
 - Source filenames and chunk IDs exposed
 
 - Vector distance scores displayed for retrieval quality evaluation
 
-- Traceability
+Traceability:
 
 - Metadata preservation (source, chunk_id)
 
 - Full audit trail from answer → chunk → document
 
-System Architecture
+**System Architecture**
 Two-Phase RAG Pipeline:
 1. Knowledge Ingestion (Insertion Phase)
 
@@ -96,7 +96,7 @@ Two-Phase RAG Pipeline:
 
 - Enforce citation + refusal logic
 
-Dataset Sources and Structure:
+**Dataset Sources and Structure:**
 
 - Local .txt files stored in /data
 
@@ -126,7 +126,7 @@ Each document is treated as a first-class source
 
 Metadata is preserved for traceability and citation
 
-Evaluation Framework
+**Evaluation Framework**
 Metrics:
 
 - Vector Distance Scores (cosine distance from ChromaDB)
@@ -151,7 +151,7 @@ Behavioral Validation:
 
 - No speculative generation allowed
 
-Technologies Used
+**Technologies Used**
 
 - Python
 
@@ -167,7 +167,7 @@ Technologies Used
 
 - Streamlit (optional UI interface)
 
-Project Structure
+**Project Structure**
 project-root/
 │
 ├── src/
@@ -181,7 +181,7 @@ project-root/
 ├── requirements.txt
 └── .env
 
-Setup Instructions
+**Setup Instructions**
 1. Install Dependencies
 pip install -r requirements.txt
 
@@ -213,7 +213,7 @@ CHUNK_SIZE=900
 CHUNK_OVERLAP=150
 COLLECTION_NAME=rag_collection
 
-Running the Project
+**Running the Project**
 CLI Mode
 
 Navigate to project root:
@@ -229,7 +229,7 @@ python src/app.py --mode chat
 Optional UI
 streamlit run src/streamlit_app.py
 
-Example Behavior
+**Example Behavior**
 Valid Query
 User: What is quantum computing?
 → Grounded answer with citations
@@ -243,7 +243,7 @@ Low-Relevance Query
 → Query rejected by relevance threshold
 → Safe refusal behavior
 
-Deployment Considerations:
+**Deployment Considerations:**
 
 - Logging & monitoring integration
 
@@ -261,7 +261,7 @@ Deployment Considerations:
 
 - Vector DB scaling strategies
 
-Educational Alignment:
+**Educational Alignment:**
 
 - This project directly implements concepts from the ReadyTensor learning materials:
 
@@ -285,7 +285,7 @@ Educational Alignment:
 
 -Agentic system architecture
 
-Outcome
+**Outcome**
 
 This system transforms a general-purpose LLM into a domain-aware, evidence-grounded AI assistant capable of:
 
