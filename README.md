@@ -124,7 +124,7 @@ It is developed as part of the ReadyTensor Agentic AI Developer Certification an
 
 - Space Exploration
 
-Mixed-domain design enables:
+**Mixed-domain design enables:**
 
 - Cross-topic retrieval testing
 
@@ -206,15 +206,16 @@ project-root/
 ## Setup Instructions
 
 ### 1. Install Dependencies
+```
 pip install -r requirements.txt
-
-2. Add Documents
+```
+### 2. Add Documents
 
 Place your .txt files into:
 
 /data
 
-3. Configure API Keys
+### 3. Configure API Keys
 
 Create a .env file:
 ```
