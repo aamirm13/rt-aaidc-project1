@@ -1,8 +1,10 @@
-**RAG Assistant**
+# RAG Assistant
 
 **LangChain + ChromaDB | ReadyTensor Agentic AI Developer Certification**
 
-**Overview**
+---
+
+## Overview
 
 This project implements a Retrieval-Augmented Generation (RAG) assistant that answers user questions using a local document collection (data/) instead of relying on static model training knowledge.
 
@@ -14,9 +16,11 @@ Ingest → Chunk → Embed → Store → Retrieve → Generate
 
 It is developed as part of the ReadyTensor Agentic AI Developer Certification and follows the architectural principles taught in the learning material on embeddings, vector databases, chunking strategies, semantic retrieval, and retrieval-augmented generation.
 
-**Key Features**
+---
 
-Core RAG Capabilities:
+## Key Features
+
+### Core RAG Capabilities:
 
 - Vector database retrieval using ChromaDB (cosine similarity / HNSW index)
 
@@ -36,15 +40,15 @@ Core RAG Capabilities:
 
 - Environment-based model switching using .env configuration
 
-**Safety, Reliability, and Control:**
+### Safety, Reliability, and Control
 
-Relevance Thresholding:
+**Relevance Thresholding:**
 
 - Vector distance filtering rejects off-topic queries
 
 - Prevents hallucinated answers for unrelated inputs
 
-Prompt Hardening:
+**Prompt Hardening:**
 
 - System prompt enforces grounded answers only
 
@@ -52,29 +56,31 @@ Prompt Hardening:
 
 - Immunity to instruction override attempts (prompt injection resistance)
 
-Grounded Answering:
+**Grounded Answering:**
 
 - Answers use retrieved context only
 
 - Refusal behavior:
 “I don't know based on the provided documents.”
 
-Transparency:
+**Transparency:**
 
 - Source filenames and chunk IDs exposed
 
 - Vector distance scores displayed for retrieval quality evaluation
 
-Traceability:
+**Traceability:**
 
 - Metadata preservation (source, chunk_id)
 
 - Full audit trail from answer → chunk → document
 
-**System Architecture**
+---
 
-Two-Phase RAG Pipeline:
-1. Knowledge Ingestion (Insertion Phase)
+## System Architecture
+
+### Two-Phase RAG Pipeline:
+#### 1. Knowledge Ingestion (Insertion Phase)
 
 - Load .txt documents from /data
 
@@ -84,7 +90,7 @@ Two-Phase RAG Pipeline:
 
 - Store embeddings + text + metadata in persistent ChromaDB
 
-2. Retrieval & Generation (Inference Phase)
+#### 2. Retrieval & Generation (Inference Phase)
 
 - Embed user query
 
@@ -98,13 +104,15 @@ Two-Phase RAG Pipeline:
 
 - Enforce citation + refusal logic
 
-**Dataset Sources and Structure:**
+---
+
+## Dataset Sources and Structure:
 
 - Local .txt files stored in /data
 
 - Users can change the contents upon which their AI Assistant's knowledge base draws from, by editing the /data folder
 
-Multi-domain content including:
+**Multi-domain content including:**
 
 - Artificial Intelligence
 
@@ -128,9 +136,11 @@ Each document is treated as a first-class source
 
 Metadata is preserved for traceability and citation
 
-**Evaluation Framework**
+---
 
-Metrics:
+## Evaluation Framework
+
+### Metrics:
 
 - Vector Distance Scores (cosine distance from ChromaDB)
 
@@ -144,7 +154,7 @@ Metrics:
 
 - Hallucination Prevention
 
-Behavioral Validation:
+### Behavioral Validation:
 
 - In-scope queries → grounded, cited answers
 
@@ -154,7 +164,9 @@ Behavioral Validation:
 
 - No speculative generation allowed
 
-**Technologies Used**
+---
+
+## Technologies Used
 
 - Python
 
@@ -170,8 +182,12 @@ Behavioral Validation:
 
 - Streamlit (optional UI interface)
 
-**Project Structure**
+---
 
+
+## Project Structure
+
+```text
 project-root/
 │
 ├── src/
@@ -184,10 +200,12 @@ project-root/
 ├── README.md
 ├── requirements.txt
 └── .env
+```
+---
 
-**Setup Instructions**
+## Setup Instructions
 
-1. Install Dependencies
+### 1. Install Dependencies
 pip install -r requirements.txt
 
 2. Add Documents
@@ -199,16 +217,16 @@ Place your .txt files into:
 3. Configure API Keys
 
 Create a .env file:
-
+```
 OPENAI_API_KEY=your_key_here
 # or
 GROQ_API_KEY=your_key_here
 # or
 GOOGLE_API_KEY=your_key_here
-
+```
 
 Optional configuration:
-
+```
 OPENAI_MODEL=gpt-4o-mini
 GROQ_MODEL=llama-3.1-8b-instant
 GOOGLE_MODEL=gemini-2.0-flash
@@ -217,24 +235,27 @@ RELEVANCE_THRESHOLD=1.3
 CHUNK_SIZE=900
 CHUNK_OVERLAP=150
 COLLECTION_NAME=rag_collection
-
+```
 **Running the Project**
 
 CLI Mode
 
 Navigate to project root:
-
+```
 python src/app.py
-
+```
 Ingest Only
+```
 python src/app.py --mode ingest
-
+```
 Chat Mode
+```
 python src/app.py --mode chat
-
+```
 Optional UI
+```
 streamlit run src/streamlit_app.py
-
+```
 **Example Behavior**
 
 Valid Query
