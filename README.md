@@ -213,7 +213,13 @@ pip install -r requirements.txt
 
 Place your .txt files into:
 
-/data
+/data/
+
+**After adding files, always run ingestion**
+
+```
+python src/app.py --mode ingest
+```
 
 ### 3. Configure API Keys
 
