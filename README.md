@@ -223,6 +223,16 @@ python src/app.py --mode ingest
 
 ### 3. Configure API Keys
 
+This project supports the following LLM providers:
+
+- OpenAI → ChatOpenAI
+
+- Groq → ChatGroq
+
+- Google Gemini → ChatGoogleGenerativeAI
+
+**Set only one API key for the provider you wish to use.**
+
 Create a .env file:
 ```
 OPENAI_API_KEY=your_key_here
@@ -231,6 +241,15 @@ GROQ_API_KEY=your_key_here
 # or
 GOOGLE_API_KEY=your_key_here
 ```
+**Important:**
+
+The application selects the LLM provider based on which API key is detected in the environment.
+
+If multiple API keys are present, the system will use the first supported key it detects (based on internal priority logic).
+
+To avoid unintended provider selection, ensure that **only the API key for your desired provider is defined in the .env file.**
+
+For example, if using Groq, remove or comment out any OPENAI_API_KEY or GOOGLE_API_KEY entries.
 
 Optional configuration:
 ```

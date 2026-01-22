@@ -1,8 +1,7 @@
 import os
 import streamlit as st
 
-# Import your RAGAssistant without changing your existing files.
-# This tries both common module-name casings so it works on Windows + Linux.
+# Import RAGAssistant without changing existing files.
 try:
     from app import RAGAssistant
 except Exception as e1:
@@ -12,7 +11,7 @@ except Exception as e1:
     ) from e1
 
 
-# ---------- Page config ----------
+#  Page config 
 st.set_page_config(
     page_title="RAG Assistant",
     page_icon="💬",
@@ -20,7 +19,7 @@ st.set_page_config(
 )
 
 
-# ---------- Styling (simple, clean, iMessage-like) ----------
+#  Styling simple & clean
 st.markdown(
     """
     <style>
@@ -70,19 +69,40 @@ st.markdown(
         background: #eee;
         margin: 18px 0;
       }
+
+      /* Make the notice OK button a small circular sky-blue button */
+      div[data-testid="stButton"] > button[data-testid="baseButton-primary"][aria-label="dismiss_start_notice"],
+      div[data-testid="stButton"] > button[data-testid="baseButton-secondary"][aria-label="dismiss_start_notice"],
+      div[data-testid="stButton"] > button[aria-label="dismiss_start_notice"] {
+        width: 34px !important;
+        height: 34px !important;
+        padding: 0 !important;
+        border-radius: 999px !important;
+        background: #e8f2ff !important;      /* same shade as notice */
+        border: 1px solid #b9d7ff !important;
+        color: #0b3d91 !important;
+        font-weight: 700 !important;
+        min-width: 34px !important;
+      }
+      div[data-testid="stButton"] > button[aria-label="dismiss_start_notice"]:hover {
+        background: #d9ebff !important;
+        border-color: #9fc7ff !important;
+      }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
 
-# ---------- App state ----------
+#  App state
 if "page" not in st.session_state:
     st.session_state.page = "welcome"  # welcome -> chat
 if "assistant" not in st.session_state:
     st.session_state.assistant = None
 if "messages" not in st.session_state:
     st.session_state.messages = []  # list of {"role": "user"/"assistant", "content": str, "sources": optional}
+if "show_start_notice" not in st.session_state:
+    st.session_state.show_start_notice = False
 
 
 def get_or_create_assistant() -> RAGAssistant:
@@ -90,7 +110,7 @@ def get_or_create_assistant() -> RAGAssistant:
     if st.session_state.assistant is None:
         a = RAGAssistant()
 
-        # Auto-ingest if DB empty (mirrors your CLI behavior)
+        # Auto-ingest if DB empty
         if a.vector_db.count() == 0:
             data_dir = os.getenv("DATA_DIR", "data")
             a.ingest(data_dir)
@@ -99,7 +119,7 @@ def get_or_create_assistant() -> RAGAssistant:
     return st.session_state.assistant
 
 
-# ---------- Welcome page ----------
+#  Welcome page
 def render_welcome():
     st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
 
@@ -131,17 +151,40 @@ def render_welcome():
     st.write("")
     if st.button("Begin", use_container_width=True):
         st.session_state.page = "chat"
+        st.session_state.show_start_notice = True
         st.rerun()
 
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ---------- Chat page ----------
+# Chat page
 def render_chat():
     st.markdown('<div class="chat-wrap">', unsafe_allow_html=True)
     st.title("Chat")
 
-    # Optional: small header
+    if st.session_state.show_start_notice:
+        notice_cols = st.columns([12, 1])
+        with notice_cols[0]:
+            st.markdown(
+                """
+                <div style="
+                    background-color: #e8f2ff;
+                    padding: 12px 14px;
+                    border-radius: 10px;
+                    font-size: 0.95rem;
+                    color: #0b3d91;
+                ">
+                  Please allow 5–10 seconds after sending your first message for the chat to begin.
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with notice_cols[1]:
+            if st.button("OK", key="dismiss_start_notice", help="Dismiss"):
+                st.session_state.show_start_notice = False
+                st.rerun()
+
+    # small header
     st.caption("Grounded answers with source citations • Type a question below")
 
     # Render history
@@ -164,16 +207,15 @@ def render_chat():
 
     st.write("")  # spacing
 
+    # New chat button
+    if st.button("New chat", use_container_width=True):
+        st.session_state.messages = []
+        st.rerun()
+
     # Input row (bottom)
     with st.form("chat_form", clear_on_submit=True):
         user_text = st.text_input("Message", placeholder="Type your question…")
-        cols = st.columns([1, 1])
-        submitted = cols[1].form_submit_button("Send", use_container_width=True)
-        reset = cols[0].form_submit_button("New chat", use_container_width=True)
-
-    if reset:
-        st.session_state.messages = []
-        st.rerun()
+        submitted = st.form_submit_button("Send", use_container_width=True)
 
     if submitted and user_text.strip():
         assistant = get_or_create_assistant()
@@ -197,7 +239,7 @@ def render_chat():
     st.markdown("</div>", unsafe_allow_html=True)
 
 
-# ---------- Router ----------
+# Router 
 if st.session_state.page == "welcome":
     render_welcome()
 else:

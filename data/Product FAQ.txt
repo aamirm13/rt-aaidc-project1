@@ -1,0 +1,19 @@
+Product FAQ
+
+Product: SkyNotes v2.1
+
+Pricing
+- Starter: $9/month (up to 3 projects)
+- Pro: $19/month (unlimited projects, priority support)
+
+Integrations
+- Slack integration available on Pro plan only.
+- Google Drive integration available on Starter and Pro.
+
+Data Retention
+- Deleted notes are recoverable for 14 days.
+- After 14 days, deleted notes are permanently removed.
+
+Support
+- Support hours: 09:00–17:00 UTC, Monday–Friday.
+- Average first response time: Pro = 6 hours, Starter = 24 hours.
