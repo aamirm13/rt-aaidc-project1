@@ -108,9 +108,26 @@ It is developed as part of the ReadyTensor Agentic AI Developer Certification an
 
 ## Dataset Sources and Structure:
 
-- Local .txt files stored in /data
+- Local .txt files **only** stored in /data - PDF, DOC etc are not currently supported, only .txt
+
+- The default dataset includes the sample .txt files from the official ReadyTensor template repository:
+https://github.com/readytensor/rt-aaidc-project1-template/tree/main/data
+
+These files are used as the initial knowledge base for testing and demonstration purposes.
 
 - Users can change the contents upon which their AI Assistant's knowledge base draws from, by editing the /data folder
+
+- To add new knowledge, place additional .txt files into /data/
+
+- To remove knowledge, delete the corresponding .txt files from /data/
+
+- Only .txt files are ingested — other file types will be ignored
+
+After adding or removing files, you must re-run ingestion:
+
+```
+python src/app.py --mode ingest
+```
 
 **Multi-domain content including:**
 
