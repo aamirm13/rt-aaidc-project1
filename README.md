@@ -297,7 +297,8 @@ python src/app.py --mode chat
 ```
 Optional UI
 ```
-streamlit run src/streamlit_app.py
+python -m streamlit run src/streamlit_app.py
+
 ```
 **Example Behavior**
 
