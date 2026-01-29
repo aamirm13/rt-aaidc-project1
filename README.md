@@ -222,23 +222,46 @@ project-root/
 
 ## Setup Instructions
 
-### 1. Install Dependencies
+This project **requires Python 3.11 or newer**.
+
+Certain dependencies (notably networkx==3.5) do not support Python 3.10 or earlier.
+Attempting to install dependencies with an older Python version will result in installation errors.
+
+Recommended version:
+- Python 3.11.x
+
+You can verify your Python version with:
+```
+python --version
+```
+### 1. Navigate to the project root
+Open a terminal and navigate to the project root directory
+```
+cd path/to/your/project-root
+```
+### 2. Create Virtual Environment (Recommended)
+```
+python -m venv .venv
+source .venv/bin/activate  # Linux/macOS
+.venv\Scripts\activate     # Windows
+```
+### 3. Install Dependencies
 ```
 pip install -r requirements.txt
 ```
-### 2. Add Documents
+### 4. Add Documents
 
 Place your .txt files into:
 
 /data/
 
-**After adding files, always run ingestion**
+**After adding files, always run ingestion, from the project root directoy**
 
 ```
 python src/app.py --mode ingest
 ```
 
-### 3. Configure API Keys
+### 5. Configure API Key
 
 This project supports the following LLM providers:
 
@@ -298,7 +321,6 @@ python src/app.py --mode chat
 Optional UI
 ```
 python -m streamlit run src/streamlit_app.py
-
 ```
 **Example Behavior**
 
