@@ -236,12 +236,69 @@ Metadata is preserved for traceability and citation
 
 - No speculative generation allowed
 
-### Retrieval Evaluation
+### Retrieval Evaluation:
 
 The system supports basic retrieval evaluation using labeled
 query-source pairs. Metrics such as hit rate and retrieval accuracy
 can be computed to assess vector search performance.
 
+To validate retrieval performance independently from LLM generation, the project includes a dedicated evaluation script:
+```
+python src/evaluation.py
+```
+
+This script measures how effectively the vector search component retrieves the correct source documents for predefined test queries.
+
+### Evaluation Methodology:
+
+The evaluation framework uses labeled query → expected source file pairs.
+
+For each query:
+
+- The query is embedded into the same vector space as document chunks
+
+- Top-K nearest chunks are retrieved from ChromaDB
+
+- The retrieved sources are compared against the expected document
+
+- Results are evaluated both:
+
+- Before relevance thresholding
+
+- After relevance thresholding
+
+This isolates and measures the quality of:
+
+- Embedding performance
+
+- Vector similarity search
+
+- Relevance gating behavior
+
+Importantly, this evaluation measures retrieval accuracy only — not LLM answer quality.
+
+| Metric                  | Description                                                                |
+| ----------------------- | -------------------------------------------------------------------------- |
+| Top-K                   | Number of retrieved chunks considered                                      |
+| Raw Top-K Hit Rate      | % of queries where expected source appears in Top-K (no threshold applied) |
+| Post-Threshold Hit Rate | % of queries where expected source appears after relevance filtering       |
+| Best Distance           | Lowest cosine distance for a retrieved chunk (lower = more similar)        |
+| Gated Out               | Whether threshold filtering removed otherwise valid results                |
+
+
+### Why Evaluation Retrieval Matters:
+
+Separating retrieval evaluation from generation ensures:
+
+- Retrieval quality is objectively measurable
+
+- Hallucination prevention mechanisms can be validated
+
+- Threshold tuning can be performed scientifically
+
+- The embedding model choice is empirically justified
+
+This aligns with production RAG best practices, where retrieval performance must be validated independently before evaluating answer generation quality.
 ---
 
 ## Technologies Used
