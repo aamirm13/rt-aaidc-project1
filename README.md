@@ -236,6 +236,12 @@ Metadata is preserved for traceability and citation
 
 - No speculative generation allowed
 
+### Retrieval Evaluation
+
+The system supports basic retrieval evaluation using labeled
+query-source pairs. Metrics such as hit rate and retrieval accuracy
+can be computed to assess vector search performance.
+
 ---
 
 ## Technologies Used
@@ -376,6 +382,10 @@ python src/app.py --mode chat
 Optional UI
 ```
 python -m streamlit run src/streamlit_app.py
+```
+Retrieval Evaluation
+```
+python src/evaluation.py
 ```
 **Example Behavior**
 
