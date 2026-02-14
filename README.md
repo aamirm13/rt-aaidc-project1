@@ -18,6 +18,31 @@ It is developed as part of the ReadyTensor Agentic AI Developer Certification an
 
 ---
 
+## Default Knowledge Domain
+
+This RAG assistant is **domain-adaptable**, meaning its knowledge is entirely defined by the documents placed in the `/data` directory.
+
+For evaluation and demonstration purposes, the default dataset focuses on **emerging technology research topics**, including:
+
+- Artificial Intelligence
+- Biotechnology
+- Quantum Computing
+- Sustainable Energy
+- Space Exploration
+
+This default domain was intentionally selected to simulate a realistic multi-disciplinary research corpus and to evaluate:
+
+- Cross-domain semantic retrieval performance
+- Relevance threshold behavior
+- Hallucination prevention in mixed-topic settings
+
+⚠️ The assistant does not have a hard-coded domain.  
+Its domain is determined entirely by the documents that are ingested.
+
+Replacing the `.txt` files inside `/data` and re-running ingestion will redefine the assistant’s knowledge scope.
+
+---
+
 ## Key Features
 
 ### Core RAG Capabilities:
@@ -128,6 +153,36 @@ After adding or removing files, you must re-run ingestion:
 ```
 python src/app.py --mode ingest
 ```
+
+---
+### Knowledge Base Lifecycle Management
+
+The assistant’s knowledge base is managed through an explicit ingestion lifecycle.
+
+Knowledge handling follows these principles:
+
+**1. Controlled Ingestion**
+Only `.txt` files inside `/data` are processed. This prevents accidental ingestion of unsupported formats or corrupted files.
+
+**2. Persistent Vector Storage**
+Embeddings are stored in a persistent ChromaDB collection, ensuring that:
+- Data survives application restarts
+- Re-ingestion updates the index deterministically
+- Retrieval remains consistent across sessions
+
+**3. Metadata Preservation**
+Each chunk is stored with:
+- `source` (filename)
+- `chunk_id`
+- embedding vector
+
+This enables:
+- Full traceability
+- Source citation
+- Answer-to-document auditing
+
+**4. Explicit Re-ingestion Requirement**
+After modifying `/data`, ingestion must be re-run:
 
 **Multi-domain content including:**
 
